@@ -279,12 +279,31 @@ void CConfigManager::reinitLuaState() {
     m_lua = luaL_newstate();
     luaL_openlibs(m_lua);
 
+    // Sandbox: restrict dangerous debug module functions
     lua_getglobal(m_lua, "debug");
     if (lua_istable(m_lua, -1)) {
+        for (const char* fn : {"sethook", "gethook", "getlocal", "setlocal", "getupvalue", "setupvalue", "setmetatable", "getregistry"}) {
+            lua_pushnil(m_lua);
+            lua_setfield(m_lua, -2, fn);
+        }
+    }
+    lua_pop(m_lua, 1);
+
+    // Sandbox: restrict dangerous os module functions
+    lua_getglobal(m_lua, "os");
+    if (lua_istable(m_lua, -1)) {
+        for (const char* fn : {"execute", "remove", "rename", "tmpname"}) {
+            lua_pushnil(m_lua);
+            lua_setfield(m_lua, -2, fn);
+        }
+    }
+    lua_pop(m_lua, 1);
+
+    // Sandbox: restrict dangerous io module functions
+    lua_getglobal(m_lua, "io");
+    if (lua_istable(m_lua, -1)) {
         lua_pushnil(m_lua);
-        lua_setfield(m_lua, -2, "sethook");
-        lua_pushnil(m_lua);
-        lua_setfield(m_lua, -2, "gethook");
+        lua_setfield(m_lua, -2, "popen");
     }
     lua_pop(m_lua, 1);
 
