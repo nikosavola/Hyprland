@@ -277,8 +277,10 @@ void CMonitor::onConnect(bool noRule) {
 
     RASSERT(thisWrapper->get(), "CMonitor::onConnect: Had no wrapper???");
 
-    if (std::ranges::find_if(g_pCompositor->m_monitors, [&](auto& other) { return other.get() == this; }) == g_pCompositor->m_monitors.end())
+    if (std::ranges::find_if(g_pCompositor->m_monitors, [&](auto& other) { return other.get() == this; }) == g_pCompositor->m_monitors.end()) {
         g_pCompositor->m_monitors.push_back(*thisWrapper);
+        g_pCompositor->m_monitorByID[m_id] = *thisWrapper;
+    }
 
     m_enabled = true;
 
@@ -505,6 +507,7 @@ void CMonitor::onDisconnect(bool destroy) {
     }
 
     std::erase_if(g_pCompositor->m_monitors, [&](PHLMONITOR& el) { return el.get() == this; });
+    g_pCompositor->m_monitorByID.erase(m_id);
 }
 
 static NColorManagement::eTransferFunction chooseTF(NTransferFunction::eTF tf) {
@@ -1267,8 +1270,10 @@ void CMonitor::setMirror(const std::string& mirrorOf) {
 
         RASSERT(thisWrapper->get(), "CMonitor::setMirror: Had no wrapper???");
 
-        if (std::ranges::find_if(g_pCompositor->m_monitors, [&](auto& other) { return other.get() == this; }) == g_pCompositor->m_monitors.end())
+        if (std::ranges::find_if(g_pCompositor->m_monitors, [&](auto& other) { return other.get() == this; }) == g_pCompositor->m_monitors.end()) {
             g_pCompositor->m_monitors.push_back(*thisWrapper);
+            g_pCompositor->m_monitorByID[m_id] = *thisWrapper;
+        }
 
         setupDefaultWS(RULE);
 
@@ -1305,6 +1310,7 @@ void CMonitor::setMirror(const std::string& mirrorOf) {
 
         // remove from mvmonitors
         std::erase_if(g_pCompositor->m_monitors, [&](const auto& other) { return other == m_self; });
+        g_pCompositor->m_monitorByID.erase(m_id);
 
         g_pCompositor->scheduleMonitorStateRecheck();
 

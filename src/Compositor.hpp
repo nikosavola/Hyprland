@@ -60,6 +60,9 @@ class CCompositor {
     std::vector<PHLLSREF>                        m_surfacesFadingOut;
     std::vector<SP<Desktop::View::IView>>        m_otherViews;
 
+    std::unordered_map<MONITORID, PHLMONITORREF>   m_monitorByID;
+    std::unordered_map<WORKSPACEID, PHLWORKSPACEREF> m_workspaceByID;
+
     std::unordered_map<std::string, MONITORID>   m_monitorIDMap;
     std::unordered_map<std::string, WORKSPACEID> m_seenMonitorWorkspaceMap; // map of seen monitor names to workspace IDs
 
