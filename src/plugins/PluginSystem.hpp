@@ -40,10 +40,10 @@ class CPluginSystem {
     void                   unloadPlugin(const CPlugin* plugin, bool eject = false);
     void                   unloadAllPlugins();
     void                   updateConfigPlugins(const std::vector<std::string>& plugins, bool& changed);
-    CPlugin*               getPluginByPath(const std::string& path);
-    CPlugin*               getPluginByHandle(HANDLE handle);
-    std::vector<CPlugin*>  getAllPlugins();
-    size_t                 pluginCount();
+    [[nodiscard]] CPlugin*               getPluginByPath(const std::string& path);
+    [[nodiscard]] CPlugin*               getPluginByHandle(HANDLE handle);
+    [[nodiscard]] std::vector<CPlugin*>  getAllPlugins();
+    [[nodiscard]] size_t                 pluginCount();
     void                   sigGetPlugins(CPlugin** data, size_t len);
 
     bool                   m_allowConfigVars = false;

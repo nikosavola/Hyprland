@@ -68,18 +68,18 @@ namespace Config::Lua {
         virtual std::string                      currentConfigPath() override;
         virtual const std::vector<std::string>&  getConfigPaths() override;
 
-        virtual std::expected<void, std::string> generateDefaultConfig(const std::filesystem::path&, bool safeMode) override;
+        virtual [[nodiscard]] std::expected<void, std::string> generateDefaultConfig(const std::filesystem::path&, bool safeMode) override;
 
         virtual void                             handlePluginLoads() override;
-        virtual bool                             configVerifPassed() override;
+        virtual [[nodiscard]] bool                             configVerifPassed() override;
 
-        virtual std::expected<void, std::string> registerPluginValue(void* handle, SP<Config::Values::IValue> value) override;
+        virtual [[nodiscard]] std::expected<void, std::string> registerPluginValue(void* handle, SP<Config::Values::IValue> value) override;
         virtual void                             onPluginUnload(void* handle) override;
 
         int                                      invokePluginLuaFunctionByID(uint64_t id, lua_State* L);
 
-        std::expected<void, std::string>         registerPluginLuaFunction(void* handle, const std::string& namespace_, const std::string& name, PLUGIN_LUA_FN fn);
-        std::expected<void, std::string>         unregisterPluginLuaFunction(void* handle, const std::string& namespace_, const std::string& name);
+        [[nodiscard]] std::expected<void, std::string>         registerPluginLuaFunction(void* handle, const std::string& namespace_, const std::string& name, PLUGIN_LUA_FN fn);
+        [[nodiscard]] std::expected<void, std::string>         unregisterPluginLuaFunction(void* handle, const std::string& namespace_, const std::string& name);
 
         void                                     addError(std::string&& str);
 
@@ -87,7 +87,7 @@ namespace Config::Lua {
         void                                     callLuaFn(int ref);
 
         // execute an arbitrary lua string on the current state.
-        std::optional<std::string> eval(const std::string& code);
+        [[nodiscard]] std::optional<std::string> eval(const std::string& code);
 
         int                        guardedPCall(int nargs, int nresults, int errfunc, int timeoutMs, std::string_view context);
 
@@ -101,8 +101,8 @@ namespace Config::Lua {
         static constexpr int       LUA_TIMEOUT_EVAL_MS               = 250;
         static constexpr int       LUA_TIMEOUT_DISPATCH_MS           = 100;
 
-        bool                       isFirstLaunch() const;
-        bool                       isDynamicParse() const;
+        [[nodiscard]] bool                       isFirstLaunch() const;
+        [[nodiscard]] bool                       isDynamicParse() const;
 
         std::string                m_currentSubmap;
         std::string                m_currentSubmapReset;
