@@ -573,6 +573,7 @@ void CCompositor::cleanup() {
     g_pPluginSystem->unloadAllPlugins();
 
     m_workspaces.clear();
+    m_workspaceByID.clear();
     m_windows.clear();
 
     for (auto const& m : m_monitors) {
@@ -582,6 +583,7 @@ void CCompositor::cleanup() {
     g_pXWayland.reset();
 
     m_monitors.clear();
+    m_monitorByID.clear();
 
     wl_display_destroy_clients(g_pCompositor->m_wlDisplay);
     removeAllSignals();
@@ -818,8 +820,12 @@ void CCompositor::startCompositor() {
 }
 
 PHLMONITOR CCompositor::getMonitorFromID(const MONITORID& id) {
+    if (m_monitorByID.contains(id))
+        return m_monitorByID[id].lock();
+
     for (auto const& m : m_monitors) {
         if (m->m_id == id) {
+            m_monitorByID[id] = m;
             return m;
         }
     }
@@ -1271,9 +1277,18 @@ PHLWINDOW CCompositor::getWindowFromHandle(uint32_t handle) {
 }
 
 PHLWORKSPACE CCompositor::getWorkspaceByID(const WORKSPACEID& id) {
+    if (m_workspaceByID.contains(id)) {
+        auto wsp = m_workspaceByID[id].lock();
+        if (wsp && !wsp->inert())
+            return wsp;
+    }
+
     for (auto const& w : getWorkspaces()) {
-        if (w->m_id == id && !w->inert())
-            return w.lock();
+        if (w->m_id == id && !w->inert()) {
+            PHLWORKSPACE lock = w.lock();
+            m_workspaceByID[id] = lock;
+            return lock;
+        }
     }
 
     return nullptr;
@@ -2561,7 +2576,11 @@ WORKSPACEID CCompositor::getNewSpecialID() {
 
 void CCompositor::registerWorkspace(PHLWORKSPACE w) {
     m_workspaces.emplace_back(w);
-    w->m_events.destroy.listenStatic([this, weak = PHLWORKSPACEREF{w}] { std::erase(m_workspaces, weak); });
+    m_workspaceByID[w->m_id] = w;
+    w->m_events.destroy.listenStatic([this, weak = PHLWORKSPACEREF{w}, id = w->m_id] {
+        std::erase(m_workspaces, weak);
+        m_workspaceByID.erase(id);
+    });
 }
 
 std::vector<PHLWORKSPACE> CCompositor::getWorkspacesCopy() {

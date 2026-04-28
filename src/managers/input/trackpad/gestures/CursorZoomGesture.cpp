@@ -6,7 +6,7 @@
 CCursorZoomTrackpadGesture::CCursorZoomTrackpadGesture(const std::string& first, const std::string& second) {
     try {
         m_zoomValue = std::stof(first);
-    } catch (...) { ; }
+    } catch (...) { /* leave m_zoomValue at default if parsing fails */ }
 
     if (second == "mult")
         m_mode = MODE_MULT;

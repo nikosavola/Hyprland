@@ -106,7 +106,7 @@ std::optional<float> getPlusMinusKeywordResult(std::string source, float relativ
     try {
         return relative + stof(source);
     } catch (...) {
-        Log::logger->log(Log::ERR, "Invalid arg \"{}\" in getPlusMinusKeywordResult!", source);
+        Log::logger->log(Log::ERR, "Invalid arg \"{}\" in getPlusMinusKeywordResult", source);
         return {};
     }
 }

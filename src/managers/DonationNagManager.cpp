@@ -147,7 +147,7 @@ CDonationNagManager::SStateData CDonationNagManager::getState() {
     try {
         state.epoch = std::stoull(lines[0]);
         state.major = std::stoull(lines[1]);
-    } catch (...) { ; }
+    } catch (...) { /* state file corrupt or empty; previously initialized defaults will be used */ }
 
     return state;
 }
